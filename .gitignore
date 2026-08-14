@@ -2,6 +2,7 @@
 .env
 __pycache__/
 *.pyc
+.pytest_cache/
 data/labels.jsonl
 data/features.csv
 *.pt
