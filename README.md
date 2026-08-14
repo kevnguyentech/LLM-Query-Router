@@ -140,6 +140,18 @@ uvicorn api.main:app --reload
 
 ---
 
+## Testing
+
+```bash
+python -m pytest
+```
+
+Covers the pure feature-extraction and cost-metric logic (`data/features.py`, `data/relabel.py`, `models/baseline.py`) plus the FastAPI endpoints and a train/serve parity check confirming `api/main.py`'s `extract_features()` matches `data/features.py`'s `extract()` exactly, including on prompts over 1000 characters.
+
+The API and parity tests need the trained XGBoost/DistilBERT artifacts under `models/saved/` (see "Reproduce from scratch" above). If they're not present yet, `tests/test_api.py` skips cleanly instead of failing.
+
+---
+
 ## Project Structure
 
 ```
@@ -157,7 +169,13 @@ llm-query-router/
 │   └── plots/                # pareto_frontier.png, confusion matrices, training curve
 ├── api/
 │   └── main.py               # FastAPI endpoint
+├── tests/
+│   ├── test_features.py      # unit tests for data/features.py
+│   ├── test_relabel.py       # unit tests for data/relabel.py
+│   ├── test_baseline_metrics.py  # unit tests for cost/savings functions
+│   └── test_api.py           # FastAPI endpoint tests + train/serve parity check
 ├── .env                      # GROQ_API_KEY (not committed)
+├── pytest.ini
 ├── requirements.txt
 └── README.md
 ```
