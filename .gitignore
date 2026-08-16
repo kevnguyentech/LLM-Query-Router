@@ -6,15 +6,10 @@ __pycache__/
 data/labels.jsonl
 data/features.csv
 *.pt
-mlruns/
 .ipynb_checkpoints/
-mlflow.db
-mlruns/
-
 # model weights -- too large for GitHub (255MB each)
 models/saved/bert_router.pt
 models/saved/bert_router_hf/model.safetensors
-
 # MLflow
 mlflow.db
 mlruns/
