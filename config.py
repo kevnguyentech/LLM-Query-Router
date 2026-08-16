@@ -6,8 +6,11 @@ can't silently drift from each other.
 """
 
 COST = {
-    "cheap":     0.0,     # Groq free tier
-    "expensive": 2.50,    # per 1M tokens, GPT-4o equivalent pricing benchmark
+    "cheap": 0.0,   # Groq free tier (actual)
+    # Benchmark price, not Groq's actual rate for llama-3.3-70b-versatile.
+    # Used to compute relative cost savings vs a GPT-4o-class model.
+    # Swap this for Groq's published rate if you want real billing estimates.
+    "expensive": 2.50,  # USD per 1M tokens, GPT-4o-class benchmark
 }
 
 MODEL_NAMES = {
