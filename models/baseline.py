@@ -1,3 +1,4 @@
+import sys
 import json
 import pickle
 import numpy as np
@@ -24,7 +25,6 @@ PLOTS_DIR     = Path("eval/plots")
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
-import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import COST
 
