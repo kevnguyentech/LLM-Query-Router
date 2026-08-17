@@ -50,7 +50,7 @@ def extract_features(prompt: str) -> np.ndarray:
         "token_count":         len(enc.encode(prompt)),
         "sentence_count":      len(list(doc.sents)),
         "avg_word_length":     sum(len(w.strip(".,!?;:")) for w in words) / max(len(words), 1),
-        "has_math":            int(bool(re.search(r"[\+\-\*\/\=\^\%\$]|\d+\.\d+|\bsin\b|\bcos\b|\blog\b|\bsqrt\b", prompt))),
+        "has_math":            int(bool(re.search(r"[\+\*\/\=\^\%\$]|\d-\d|\d+\.\d+|\bsin\b|\bcos\b|\blog\b|\bsqrt\b", prompt))),
         "has_code":            int(bool(re.search(r"```|def |import |class |for |while |if |return |print\(", prompt))),
         "digit_count":         len(re.findall(r"\d", prompt)),
         "unique_word_ratio":   len(set(re.findall(r"\b\w+\b", lower))) / max(len(re.findall(r"\b\w+\b", lower)), 1),

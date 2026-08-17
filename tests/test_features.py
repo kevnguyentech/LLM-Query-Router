@@ -148,3 +148,9 @@ def test_extract_returns_all_fifteen_features():
     }
     assert set(feats.keys()) == expected_keys
     assert len(feats) == 15
+
+    def test_has_math_does_not_fire_on_hyphens():
+        assert has_math("a well-known state-of-the-art approach") == 0
+
+    def test_has_math_still_catches_arithmetic_minus():
+        assert has_math("3-2") == 1
