@@ -85,6 +85,13 @@ def rule_based_override(prompt: str, features: np.ndarray) -> str | None:
 
     return None
 
+def _cost_fields(tier: str, X: np.ndarray) -> tuple[float, float]:
+    """Return (estimated_cost_usd, savings_vs_expensive_usd) for a routing decision."""
+    token_count = int(X[0][0])
+    est_cost    = COST[tier] * token_count / 1_000_000
+    exp_cost    = COST["expensive"] * token_count / 1_000_000
+    return round(est_cost, 8), round(exp_cost - est_cost, 8)
+
 # ── FastAPI app ───────────────────────────────────────────────────────────────
 
 app = FastAPI(
@@ -125,16 +132,13 @@ def route(req: RouteRequest):
     if override is not None:
         tier       = override
         confidence = 1.0
-        token_count = int(X[0][0])   # already computed in extract_features
-        est_cost    = COST[tier] * token_count / 1_000_000
-        exp_cost    = COST["expensive"] * token_count / 1_000_000
-        savings     = exp_cost - est_cost
+        est_cost, savings = _cost_fields(tier, X)
         return RouteResponse(
             tier=tier,
             model=MODEL_NAMES[tier],
             confidence=confidence,
-            estimated_cost_usd=round(est_cost, 8),
-            savings_vs_expensive_usd=round(savings, 8),
+            estimated_cost_usd=est_cost,
+            savings_vs_expensive_usd=savings,
             router_used="rule_override",
         )
 
@@ -158,17 +162,13 @@ def route(req: RouteRequest):
     tier       = "expensive" if exp_prob >= req.threshold else "cheap"
     confidence = exp_prob if tier == "expensive" else 1.0 - exp_prob
 
-    token_count = int(X[0][0])   # already computed in extract_features
-    est_cost    = COST[tier] * token_count / 1_000_000
-    exp_cost    = COST["expensive"] * token_count / 1_000_000
-    savings     = exp_cost - est_cost
-
+    est_cost, savings = _cost_fields(tier, X)
     return RouteResponse(
         tier=tier,
         model=MODEL_NAMES[tier],
         confidence=round(confidence, 4),
-        estimated_cost_usd=round(est_cost, 8),
-        savings_vs_expensive_usd=round(savings, 8),
+        estimated_cost_usd=est_cost,
+        savings_vs_expensive_usd=savings,
         router_used=req.router,
     )
 
