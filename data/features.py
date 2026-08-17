@@ -29,7 +29,7 @@ def avg_word_length(text: str) -> float:
     return sum(len(w.strip(".,!?;:")) for w in words) / len(words)
 
 def has_math(text: str) -> int:
-    pattern = r"[\+\-\*\/\=\^\%\$]|\d+\.\d+|\bsin\b|\bcos\b|\blog\b|\bsqrt\b"
+    pattern = r"[\+\*\/\=\^\%\$]|\d-\d|\d+\.\d+|\bsin\b|\bcos\b|\blog\b|\bsqrt\b"
     return int(bool(re.search(pattern, text)))
 
 def has_code(text: str) -> int:
