@@ -186,8 +186,10 @@ def main():
             mlflow.log_metrics({"f1_macro": res["f1_macro"], "savings_pct": res["savings_pct"]})
             results.append(res)
 
-            pickle.dump(lr, open(MODELS_DIR / f"lr_{experiment}.pkl", "wb"))
-            pickle.dump(le, open(MODELS_DIR / "label_encoder.pkl", "wb"))
+            with open(MODELS_DIR / f"lr_{experiment}.pkl", "wb") as _f:
+                pickle.dump(lr, _f)
+            with open(MODELS_DIR / "label_encoder.pkl", "wb") as _f:
+                pickle.dump(le, _f)
 
         # ── XGBoost ──
         with mlflow.start_run(run_name=f"xgb_{experiment}"):
@@ -227,7 +229,8 @@ def main():
                     path=PLOTS_DIR / "xgb_feature_importance_with_src.png",
                 )
 
-            pickle.dump(xgb, open(MODELS_DIR / f"xgb_{experiment}.pkl", "wb"))
+            with open(MODELS_DIR / f"xgb_{experiment}.pkl", "wb") as _f:
+                pickle.dump(xgb, _f)
 
     # ── summary ──
     print(f"\n{'='*60}")
