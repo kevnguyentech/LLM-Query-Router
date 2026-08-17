@@ -17,8 +17,10 @@ nlp = spacy.load("en_core_web_sm")
 enc = tiktoken.get_encoding("cl100k_base")
 
 # load artifacts once at startup
-le      = pickle.load(open(MODELS_DIR / "label_encoder.pkl", "rb"))
-xgb     = pickle.load(open(MODELS_DIR / "xgb_no_source_flags.pkl", "rb"))
+with open(MODELS_DIR / "label_encoder.pkl", "rb") as _f:
+    le = pickle.load(_f)
+with open(MODELS_DIR / "xgb_no_source_flags.pkl", "rb") as _f:
+    xgb = pickle.load(_f)
 
 tokenizer = DistilBertTokenizerFast.from_pretrained(str(MODELS_DIR / "bert_tokenizer"))
 bert      = DistilBertForSequenceClassification.from_pretrained(
