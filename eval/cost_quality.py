@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import torch
-import sys
 from pathlib import Path
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
 from sklearn.preprocessing import LabelEncoder
@@ -19,6 +18,7 @@ PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MAX_LEN = 256
 
+import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import COST
 
@@ -168,14 +168,16 @@ def plot_pareto(strategies, xgb_points, bert_points, path):
 
 def main():
     # load data
-    rows         = [json.loads(l) for l in open(LABELS_PATH)]
+    with open(LABELS_PATH) as _f:
+        rows = [json.loads(l) for l in _f]
     prompts      = [r["prompt"] for r in rows]
     y_true       = [r["tier"]   for r in rows]
     df           = pd.read_csv(FEATURES_PATH)
     token_counts = df["token_count"].values
     X_no_src     = df[FEATURE_COLS_NO_SRC].values
 
-    le = pickle.load(open(MODELS_DIR / "label_encoder.pkl", "rb"))
+    with open(MODELS_DIR / "label_encoder.pkl", "rb") as _f:
+        le = pickle.load(_f)
 
     # baseline strategies
     print("Computing baseline strategies...")
@@ -185,7 +187,8 @@ def main():
 
     # XGBoost sweep
     print("\nRunning XGBoost threshold sweep...")
-    xgb = pickle.load(open(MODELS_DIR / "xgb_no_source_flags.pkl", "rb"))
+    with open(MODELS_DIR / "xgb_no_source_flags.pkl", "rb") as _f:
+        xgb = pickle.load(_f)
     xgb_points = xgb_threshold_sweep(xgb, le, X_no_src, y_true, token_counts)
 
     # DistilBERT sweep
