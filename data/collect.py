@@ -19,7 +19,13 @@ SLEEP_BETWEEN_CALLS = 1.5   # seconds, avoids Groq rate limit
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
-def query_model(model: str, prompt: str, max_tokens: int = 64) -> str:
+def query_model(model: str, prompt: str, max_tokens: int = 64) -> str | None:
+    """Returns the model's reply, or None if the API call failed.
+
+    None is distinct from "": "" means the model replied with nothing,
+    None means we never got a reply. Callers must discard the row rather
+    than score it as a wrong answer.
+    """
     try:
         response = client.chat.completions.create(
             model=model,
@@ -30,7 +36,7 @@ def query_model(model: str, prompt: str, max_tokens: int = 64) -> str:
         return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"  [ERROR] {model}: {e}")
-        return ""
+        return None
 
 def extract_letter(text: str) -> str:
     """Pull the first A/B/C/D from a model response."""
@@ -117,6 +123,8 @@ def label_row(row: dict) -> dict | None:
     print(f"  [cheap ] querying...")
     cheap_response = query_model(CHEAP_MODEL, prompt, max_tokens=max_tok)
     time.sleep(SLEEP_BETWEEN_CALLS)
+    if cheap_response is None:
+        return None   # call failed -- discard, don't score as wrong
 
     if source == "gsm8k":
         cheap_correct = check_gsm8k_correct(cheap_response, answer)
@@ -127,6 +135,8 @@ def label_row(row: dict) -> dict | None:
     print(f"  [exp   ] querying...")
     exp_response = query_model(EXP_MODEL, prompt, max_tokens=max_tok)
     time.sleep(SLEEP_BETWEEN_CALLS)
+    if exp_response is None:
+        return None   # call failed -- discard, don't score as wrong
 
     if source == "gsm8k":
         exp_correct = check_gsm8k_correct(exp_response, answer)
@@ -184,7 +194,7 @@ def main():
 
             if result is None:
                 discarded += 1
-                print("  -> discarded (both wrong)")
+                print("  -> discarded (both models wrong, or API call failed)")
             else:
                 out.write(json.dumps(result) + "\n")
                 out.flush()
