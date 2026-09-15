@@ -5,9 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import torch
 from pathlib import Path
+from sklearn.model_selection import train_test_split
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import f1_score
 
 LABELS_PATH  = Path("data/labels.jsonl")
 FEATURES_PATH = Path("data/features.csv")
@@ -170,14 +169,30 @@ def main():
     # load data
     with open(LABELS_PATH) as _f:
         rows = [json.loads(l) for l in _f]
-    prompts      = [r["prompt"] for r in rows]
-    y_true       = [r["tier"]   for r in rows]
-    df           = pd.read_csv(FEATURES_PATH)
-    token_counts = df["token_count"].values
-    X_no_src     = df[FEATURE_COLS_NO_SRC].values
+    df = pd.read_csv(FEATURES_PATH)
+    assert len(rows) == len(df), (
+        f"row mismatch: {len(rows)} in {LABELS_PATH} vs {len(df)} in "
+        f"{FEATURES_PATH} -- re-run data/features.py"
+    )
 
     with open(MODELS_DIR / "label_encoder.pkl", "rb") as _f:
         le = pickle.load(_f)
+
+    # Score the held-out split only. baseline.py and bert_router.py both
+    # split with test_size=0.2, random_state=42, stratify=y, so splitting an
+    # index array with the same parameters reproduces their exact test set.
+    all_tiers = [r["tier"] for r in rows]
+    _, test_idx = train_test_split(
+        np.arange(len(rows)),
+        test_size=0.2,
+        random_state=42,
+        stratify=le.transform(all_tiers),
+    )
+    prompts      = [rows[i]["prompt"] for i in test_idx]
+    y_true       = [all_tiers[i] for i in test_idx]
+    token_counts = df["token_count"].values[test_idx]
+    X_no_src     = df[FEATURE_COLS_NO_SRC].values[test_idx]
+    print(f"Evaluating on {len(y_true)} held-out rows (of {len(rows)} total).")
 
     # baseline strategies
     print("Computing baseline strategies...")

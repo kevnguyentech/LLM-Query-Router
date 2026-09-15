@@ -29,7 +29,6 @@ bert      = DistilBertForSequenceClassification.from_pretrained(
 ).to(DEVICE)
 bert.eval()
 
-import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import COST, MODEL_NAMES
 

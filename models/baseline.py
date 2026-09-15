@@ -1,5 +1,4 @@
 import sys
-import json
 import pickle
 import numpy as np
 import pandas as pd
@@ -8,8 +7,7 @@ import seaborn as sns
 import mlflow
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import (
     classification_report,

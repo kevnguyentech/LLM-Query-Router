@@ -3,7 +3,6 @@ import json
 import spacy
 import textstat
 import tiktoken
-import numpy as np
 import pandas as pd
 from pathlib import Path
 
