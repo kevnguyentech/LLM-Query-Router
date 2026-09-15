@@ -128,11 +128,13 @@ def main():
     print(f"Device: {DEVICE}")
 
     # load raw prompts + labels from jsonl (not features.csv)
-    rows = [json.loads(l) for l in open(LABELS_PATH)]
+    with open(LABELS_PATH) as _f:
+        rows = [json.loads(l) for l in _f]
     prompts = [r["prompt"] for r in rows]
     raw_labels = [r["tier"] for r in rows]
 
-    le = pickle.load(open(MODELS_DIR / "label_encoder.pkl", "rb"))
+    with open(MODELS_DIR / "label_encoder.pkl", "rb") as _f:
+        le = pickle.load(_f)
     labels = le.transform(raw_labels)
 
     print(f"Total samples : {len(prompts)}")
