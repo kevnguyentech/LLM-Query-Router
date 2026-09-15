@@ -14,7 +14,9 @@ CHEAP_MODEL  = "llama-3.1-8b-instant"
 EXP_MODEL    = "llama-3.3-70b-versatile"
 OUTPUT_PATH  = Path("data/labels.jsonl")
 SAMPLES_PER_DATASET = 400
-SAMPLES_GSM8K       = 600   # oversample math to compensate for high discard   # 400 x 3 datasets = 1200 total, safe for free tier
+# 400 mmlu + 400 arc + 600 gsm8k = 1400 prompts, safe for the Groq free tier.
+# gsm8k is oversampled to compensate for its higher discard rate.
+SAMPLES_GSM8K       = 600
 SLEEP_BETWEEN_CALLS = 1.5   # seconds, avoids Groq rate limit
 
 # ── helpers ──────────────────────────────────────────────────────────────────
