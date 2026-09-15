@@ -7,8 +7,6 @@ import torch
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import f1_score
 
 LABELS_PATH  = Path("data/labels.jsonl")
 FEATURES_PATH = Path("data/features.csv")
